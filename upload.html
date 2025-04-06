@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Marksheet Verification System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+    <div class="bg-white p-8 rounded-lg shadow-md w-96">
+        <h1 class="text-2xl font-bold mb-6 text-center">Marksheet Verification</h1>
+        
+        <form id="uploadForm" class="space-y-4">
+            <div class="flex flex-col">
+                <label class="mb-2 font-medium">Upload Marksheet</label>
+                <input 
+                    type="file" 
+                    id="fileUpload" 
+                    accept=".pdf,.png,.jpg,.jpeg" 
+                    class="border p-2 rounded"
+                >
+            </div>
+            
+            <div class="flex items-center space-x-2">
+                <input 
+                    type="radio" 
+                    name="documentType" 
+                    value="pdf" 
+                    id="pdfType"
+                >
+                <label for="pdfType">PDF</label>
+                
+                <input 
+                    type="radio" 
+                    name="documentType" 
+                    value="image" 
+                    id="imageType"
+                >
+                <label for="imageType">Image</label>
+            </div>
+            
+            <button 
+                type="submit" 
+                class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+            >
+                Verify Marksheet
+            </button>
+        </form>
+        
+        <div id="resultContainer" class="mt-4 hidden">
+            <h2 class="font-bold">Verification Result</h2>
+            <pre id="resultText" class="bg-gray-100 p-2 rounded"></pre>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const fileInput = document.getElementById('fileUpload');
+            const resultContainer = document.getElementById('resultContainer');
+            const resultText = document.getElementById('resultText');
+            
+            if (!fileInput.files.length) {
+                alert('Please select a file');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            try {
+                const response = await fetch('/verify', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                resultContainer.classList.remove('hidden');
+                resultText.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                console.error('Verification failed:', error);
+                alert('Verification failed');
+            }
+        });
+    </script>
+</body>
+</html>
